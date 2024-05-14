@@ -8,18 +8,26 @@ local shop_select = Select:new("shop", {
         text = "Continue"
     },
     {
-        id = "repair",
-        text = "Repair"
-    },
-    {
         id = "shop",
         text = "Shop"
     },
 })
 
+local items_select = Select:new("shop_items", {
+    {
+        id = "strength",
+        text = "Strength",
+    },
+    {
+        id = "back",
+        text = "Back",
+    }
+})
 
-local cursorDefault = love.mouse.getSystemCursor("arrow")
-local cursorGrab = love.mouse.getSystemCursor("sizeall")
+local current_select = shop_select
+
+local buying = "none"
+local sell_visible = false
 
 
 function ShopScene:new()
@@ -28,7 +36,18 @@ function ShopScene:new()
 end
 
 function ShopScene:update()
-    shop_select:update()
+    current_select:update()
+
+    sell_visible = false
+    for i, element in ipairs(UIElements) do
+        if element.pos.y < GameResolution.y + 64 then
+            if element.grabbed then
+                sell_visible = true
+            else
+                element:destroy()
+            end
+        end
+    end
 end
 
 function ShopScene:draw()
@@ -36,49 +55,46 @@ function ShopScene:draw()
     love.graphics.clear(0, 0, 0, 1)
     love.graphics.setBlendMode("alpha")
 
-
-    shop_select:draw()
-end
-
-function ShopScene:mousepressed(x, y, button)
-    if button == 1 then
-        for i, button in ipairs(UIElements) do
-            if button.hovered then
-                button.grabbed = true
-                love.mouse.setCursor(cursorGrab)
-                button.grab_position = MousePos - button.pos
-                return
-            end
-        end
+    if buying ~= "none" then
+        love.graphics.print("Click where you want to place it", 20, 110)
+    elseif sell_visible then
+        love.graphics.print("Release to sell", 20, 110)
     end
-end
+    love.graphics.print("Money: " .. GameData.money .. " gears", 20, 90)
 
-function ShopScene:mousereleased(x, y, button)
-    if button == 1 then
-        for i, button in ipairs(UIElements) do
-            if button.hovered then
-                button.grabbed = true
-                love.mouse.setCursor(cursorGrab)
-                button.grab_position = MousePos - button.pos
-                return
-            end
-        end
-    end
+    current_select:draw()
 end
 
 local function selectMenuOptionSelected(option)
     if option.id == "continue" then
         CurrentScreen = Screens.game
+    elseif option.id == "shop" then
+        current_select = items_select
+    elseif current_select.id == "shop_items" then
+        if option.id == "back" then
+            current_select = shop_select
+        else
+            buying = option.id
+        end
+    end
+end
+
+function ShopScene:mousepressed(x, y, button)
+    if buying ~= "none" then
+        local mouse = vector(love.mouse.getX(), love.mouse.getY())
+        mouse = mouse / Zoom
+        UI:addElement(buying, mouse)
+        buying = "none"
     end
 end
 
 function ShopScene:keypressed(key)
-    if key == "z" then
-        shop_select.selected = shop_select.selected - 1
-    elseif key == "s" then
-        shop_select.selected = shop_select.selected + 1
+    if IsKeyPressed("move_up") then
+        current_select.selected = current_select.selected - 1
+    elseif IsKeyPressed("move_down") then
+        current_select.selected = current_select.selected + 1
     end
     if key == "space" then
-        selectMenuOptionSelected(shop_select.options[shop_select.selected])
+        selectMenuOptionSelected(current_select.options[current_select.selected])
     end
 end

@@ -1,5 +1,6 @@
 require "ui_element"
 require "button"
+require "joystick"
 vector = require "utils.vector"
 
 
@@ -8,99 +9,221 @@ vector = require "utils.vector"
 local frame = love.graphics.newImage("resources/textures/frame.png")
 UIImage = love.graphics.newImage("resources/textures/ui.png")
 
-UI = {}
-UI.__index = UI
-
-
-local dPadPos = vector(64, 300)
-local joystick_pos = vector(200, 320)
-local joystick_quad = love.graphics.newQuad(32, 224, 32, 32, UIImage:getDimensions())
-
-local arrowSize = 48
-
-local d_pad_left_origin = vector(0, 0)
-local d_pad_up_origin = vector(0, 32)
-local d_pad_right_origin = vector(0, 64)
-local d_pad_down_origin = vector(0, 96)
+UserInterface = {}
+UserInterface.__index = UserInterface
 
 
 
 
-local inertia = vector(0, 0)
-local mouse_delta = vector(0, 0)
+
+-- elements at rarity -1 are not availables to buy
+ElementsData = {
+    move_left = {
+        type = "button",
+        name = "D-PAD Left",
+        max_health = 5,
+        rarity = -1,
+        origin = vector(0, 0),
+        size = vector(30, 16),
+    },
+    move_up = {
+        type = "button",
+        name = "D-PAD Up",
+        max_health = 5,
+        rarity = -1,
+        origin = vector(0, 32),
+        size = vector(16, 30),
+    },
+    move_right = {
+        type = "button",
+        name = "D-PAD Right",
+        max_health = 5,
+        rarity = -1,
+        origin = vector(0, 64),
+        size = vector(30, 16),
+    },
+    move_down = {
+        type = "button",
+        name = "D-PAD Down",
+        max_health = 5,
+        rarity = -1,
+        origin = vector(0, 96),
+        size = vector(16, 30),
+    },
+    joystick = {
+        type = "joystick",
+        name = "Aim Joystick",
+        max_health = 5,
+        rarity = -1,
+        size = vector(24, 24)
+    },
+    strength = {
+        type = "element",
+        name = "Damage bonus",
+        origin = vector(0, 224),
+        size = vector(24, 24),
+        price = 5
+    }
+}
 
 
-function UI:new()
-    local self = setmetatable({}, UI)
+function UserInterface:addElement(id, pos)
+    local data = ElementsData[id]
 
-    -- add ui elements
+    if data.type == "button" then
+        table.insert(UIElements, Button:new(
+            id,
+            pos,
+            data.origin,
+            data.size
+        ))
+    elseif data.type == "joystick" then
+        table.insert(UIElements, Joystick:new(
+            id,
+            pos,
+            data.size
+        ))
+    elseif data.type == "element" then
+        table.insert(UIElements, UIElement:new(
+            id,
+            pos,
+            data.origin,
+            data.size
+        ))
+    end
+end
 
+function UserInterface:new()
+    local self = setmetatable({}, UserInterface)
+
+
+
+    -- dpad
+    local arrowSize = 48
     local half = arrowSize / 2
-    table.insert(UIElements, Button:new(
-        "q",
-        vector(dPadPos.x - half, dPadPos.y),
-        d_pad_left_origin,
-        vector(30, 16)
-    ))
-    table.insert(UIElements, Button:new(
-        "z",
-        vector(dPadPos.x, dPadPos.y - half),
-        d_pad_up_origin,
-        vector(16, 30)
-    ))
-    table.insert(UIElements, Button:new(
-        "s",
-        vector(dPadPos.x, dPadPos.y + half),
-        d_pad_down_origin,
-        vector(16, 30)
-    ))
-    table.insert(UIElements, Button:new(
-        "d",
-        vector(dPadPos.x + half, dPadPos.y),
-        d_pad_right_origin,
-        vector(30, 16)
-    ))
+    local dPadPos = vector(64, 300)
+    self:addElement("move_left", vector(dPadPos.x - half, dPadPos.y))
+    self:addElement("move_up", vector(dPadPos.x, dPadPos.y - half))
+    self:addElement("move_down", vector(dPadPos.x, dPadPos.y + half))
+    self:addElement("move_right", vector(dPadPos.x + half, dPadPos.y))
 
-    table.insert(UIElements, UIElement:new(
-        vector(64, 256),
-        vector(128, 0),
-        vector(32, 32)
-    ))
-    table.insert(UIElements, UIElement:new(
-        vector(Resolution.x - 64, 256),
-        vector(128, 0),
-        vector(32, 32)
-    ))
+    self:addElement("joystick", vector(Resolution.x - 64, 300))
+    -- table.insert(UIElements, Button:new(
+    --     "move_left",
+    --     ,
+    --     d_pad_left_origin,
+    --     vector(30, 16)
+    -- ))
+    -- table.insert(UIElements, Button:new(
+    --     "move_up",
+    --     vector(dPadPos.x, dPadPos.y - half),
+    --     d_pad_up_origin,
+    --     vector(16, 30)
+    -- ))
+    -- table.insert(UIElements, Button:new(
+    --     "move_down",
+    --     vector(dPadPos.x, dPadPos.y + half),
+    --     d_pad_down_origin,
+    --     vector(16, 30)
+    -- ))
+    -- table.insert(UIElements, Button:new(
+    --     "move_right",
+    --     vector(dPadPos.x + half, dPadPos.y),
+    --     d_pad_right_origin,
+    --     vector(30, 16)
+    -- ))
+
+    -- table.insert(UIElements, UIElement:new(
+    --     vector(64, 256),
+    --     vector(128, 0),
+    --     vector(32, 32)
+    -- ))
+    -- table.insert(UIElements, UIElement:new(
+    --     vector(Resolution.x - 64, 256),
+    --     vector(128, 0),
+    --     vector(32, 32)
+    -- ))
 
     return self
 end
 
-function UI:draw()
+function UserInterface:getButtonsWorking()
+    local buttonsWorking = {}
+    for i, element in ipairs(UIElements) do
+        if element.health ~= nil and element.health > 0 then
+            buttonsWorking[element.id] = true
+        end
+    end
+    return buttonsWorking
+end
+
+function UserInterface:draw()
     love.graphics.draw(frame, 0, 0)
 
     for i, element in ipairs(UIElements) do
         element:draw()
     end
-
-    local max_length = 640
-    inertia = inertia - (mouse_delta - vector(love.mouse.getX(), love.mouse.getY()))
-    inertia = inertia * 0.8
-    inertia = inertia:normalized() * math.sqrt(math.min(inertia:len(), max_length))
-
-    local joystick_base_quad = love.graphics.newQuad(32, 192, 32, 32, UIImage:getDimensions())
-    local quad = love.graphics.newQuad(0, 192, 32, 32, UIImage:getDimensions())
-
-    love.graphics.draw(UIImage, joystick_base_quad, joystick_pos.x, joystick_pos.y)
-    love.graphics.draw(UIImage, quad, math.floor(joystick_pos.x + inertia.x + 0.5),
-        math.floor(joystick_pos.y + inertia.y + 0.5))
-
-    mouse_delta.x = love.mouse.getX()
-    mouse_delta.y = love.mouse.getY()
 end
 
-function UI:update()
+local cursorDefault = love.mouse.getSystemCursor("arrow")
+local cursorHand = love.mouse.getSystemCursor("hand")
+local cursorGrab = love.mouse.getSystemCursor("sizeall")
+local cursorNo = love.mouse.getSystemCursor("no")
+
+
+function UserInterface:update()
     for i, element in ipairs(UIElements) do
         element:update()
+    end
+
+    local element_hovered = 0
+    local element_grabbed = 0
+    for i, element in ipairs(UIElements) do
+        if element.grabbed then
+            element_grabbed = element_grabbed + 1
+        elseif element.hovered then
+            element_hovered = element_hovered + 1
+        end
+    end
+
+    if element_grabbed > 0 then
+        love.mouse.setCursor(cursorGrab)
+    elseif element_hovered > 0 then
+        if CurrentScreen == Screens.shop then
+            love.mouse.setCursor(cursorHand)
+        else
+            love.mouse.setCursor(cursorNo)
+        end
+    else
+        love.mouse.setCursor(cursorDefault)
+    end
+end
+
+function UserInterface:mousepressed(x, y, button)
+    if button == 1 then
+        if CurrentScreen == Screens.shop then
+            for i, element in ipairs(UIElements) do
+                if element.hovered then
+                    element.grabbed = true
+                    element.grab_position = MousePos - element.pos
+                    return
+                end
+            end
+        else
+            for i, element in ipairs(UIElements) do
+                if element.hovered then
+                    element.trauma = 4
+                end
+            end
+        end
+    end
+end
+
+function UserInterface:mousereleased(x, y, button)
+    if button == 1 then
+        for i, element in ipairs(UIElements) do
+            element.grabbed = false
+        end
     end
 end
 

@@ -6,6 +6,7 @@ Duck = {}
 Duck.__index = Duck
 
 local duckTexture = love.graphics.newImage("resources/textures/duck.png")
+local duck_water_mask_texture = love.graphics.newImage("resources/textures/duck_water_mask.png")
 
 local friction = 0.085
 local acceleration = 0.075
@@ -37,6 +38,7 @@ function Duck:new()
     self.max_health = 5
     self.health = self.max_health
     self.anim_frame = 0
+    self.in_water = true
     self.zone_cleared = false
     self.anim_timer = 0.3
     self.flip = false
@@ -90,7 +92,12 @@ function Duck:draw()
     )
     -- local duckQuad = love.graphics.newQuad(0, 0, 16, 16, Atlas:getDimensions())
 
-    love.graphics.draw(duckTexture, duckQuad, math.floor(self.pos.x), math.floor(self.pos.y), 0, sx, 1, 16, 16)
+    local x, y = self.pos:unpackInt()
+    love.graphics.draw(duckTexture, duckQuad, x, y, 0, sx, 1, 16, 16)
+    if self.in_water then
+
+    end
+    love.graphics.draw(duck_water_mask_texture, x, y + 16, 0, 1, 1, 9, 5)
 end
 
 local trailClock = 0.1
@@ -147,16 +154,27 @@ function Duck:update()
     local input = vector(0, 0)
     local delta = love.timer.getDelta()
 
-    if love.keyboard.isDown("q") then
+    local buttonsWorking = UI:getButtonsWorking()
+
+
+    local keys_pressed = {}
+    for key, hotkeys in pairs(Bindings) do
+        for i, hotkey in ipairs(hotkeys) do
+            if love.keyboard.isDown(hotkey) then
+                keys_pressed[key] = true
+            end
+        end
+    end
+    if IsKeyPressed("move_left") == true and buttonsWorking["move_left"] == true then
         input.x = input.x - 1
     end
-    if love.keyboard.isDown("d") then
+    if IsKeyPressed("move_right") and buttonsWorking["move_right"] == true then
         input.x = input.x + 1
     end
-    if love.keyboard.isDown("z") then
+    if IsKeyPressed("move_up") and buttonsWorking["move_up"] == true then
         input.y = input.y - 1
     end
-    if love.keyboard.isDown("s") then
+    if IsKeyPressed("move_down") and buttonsWorking["move_down"] == true then
         input.y = input.y + 1
     end
 

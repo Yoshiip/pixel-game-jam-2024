@@ -6,11 +6,14 @@ setmetatable(GameScene, { __index = Scene })
 
 local ground = love.graphics.newImage("resources/textures/ground.png")
 local water_zone_texture = love.graphics.newImage("resources/textures/water_zone.png")
+local test_water_texture = love.graphics.newImage("resources/textures/terrains/4.png")
 ground:setWrap("repeat", "repeat")
 
 
 local small_shadow_quad = love.graphics.newQuad(0, 64, 32, 32, Atlas:getDimensions())
 local medium_shadow_quad = love.graphics.newQuad(32, 64, 32, 32, Atlas:getDimensions())
+local water_shader = love.graphics.newShader("resources/shaders/water.glsl")
+
 
 local water_zones = {}
 
@@ -53,14 +56,19 @@ function GameScene:draw()
     love.graphics.setBlendMode("alpha")
 
     love.graphics.draw(ground, love.graphics.newQuad(0, 0, 240, 160, ground:getDimensions()), 0, 0, 0, 1, 1)
+    love.graphics.setShader(water_shader)
+    love.graphics.draw(test_water_texture, love.graphics.newQuad(0, 0, 240, 160, test_water_texture:getDimensions()), 0,
+        0, 0, 1, 1)
 
-    for i, water in ipairs(water_zones) do
-        love.graphics.draw(water_zone_texture, water.x, water.y)
-    end
+    -- for i, water in ipairs(water_zones) do
+    --     love.graphics.draw(water_zone_texture, water.x, water.y)
+    -- end
 
     -- draw all shadows
     love.graphics.setColor(1, 1, 1, 0.4)
-    love.graphics.draw(Atlas, medium_shadow_quad, (Player.pos - vector(16, 0)):unpackInt())
+    if not Player.in_water then
+        love.graphics.draw(Atlas, medium_shadow_quad, (Player.pos - vector(16, 0)):unpackInt())
+    end
     for i, fish in ipairs(Fishes) do
         love.graphics.draw(Atlas, small_shadow_quad, (fish.pos - vector(16, 0)):unpackInt())
     end
@@ -72,6 +80,9 @@ function GameScene:draw()
     love.graphics.setColor(1, 1, 1, 1)
 
     Player:draw()
+
+    love.graphics.setShader()
+
     for i, fish in ipairs(Fishes) do
         fish:draw()
     end
@@ -85,6 +96,7 @@ function GameScene:draw()
         love.graphics.print("Archipelago cleaned", 40, 20)
         love.graphics.print("Get out of here!", 40, 40)
     end
+
 
 
     love.graphics.setCanvas(DropletsCanvas)

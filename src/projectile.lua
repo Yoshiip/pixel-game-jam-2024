@@ -71,7 +71,7 @@ end
 
 function Projectile:update()
     local delta = love.timer.getDelta()
-    local speed = 40 * delta
+    local speed = 100 * delta
     self.pos.x = self.pos.x + self.vel.x * speed
     self.pos.y = self.pos.y + self.vel.y * speed
 
