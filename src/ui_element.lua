@@ -57,11 +57,11 @@ function UIElement:drawTooltip()
         love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
         local i = 0
         if data.name ~= nil then
-            love.graphics.print(self.health .. "/" .. self.max_health, base_offset + 4, base_offset + (16 * i))
+            love.graphics.print(data.name, base_offset.x + 4, base_offset.y + (16 * i))
             i = i + 1
         end
         if data.max_health ~= nil then
-            love.graphics.print(self.health .. "/" .. data.max_health, self.pos.x + 16, self.pos.y + 16)
+            love.graphics.print(self.health .. "/" .. data.max_health, base_offset.x + 4, base_offset.y + (16 * i))
             i = i + 1
         end
     end

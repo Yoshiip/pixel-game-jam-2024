@@ -5,7 +5,7 @@ setmetatable(ShopScene, { __index = Scene })
 local shop_select = Select:new("shop", {
     {
         id = "continue",
-        text = "Continue"
+        text = "Continue",
     },
     {
         id = "shop",
@@ -14,14 +14,6 @@ local shop_select = Select:new("shop", {
 })
 
 local items_select = Select:new("shop_items", {
-    {
-        id = "strength",
-        text = "Strength",
-    },
-    {
-        id = "back",
-        text = "Back",
-    }
 })
 
 local current_select = shop_select
@@ -29,10 +21,36 @@ local current_select = shop_select
 local buying = "none"
 local sell_visible = false
 
+local function buildShop()
+    local items = {
+        "strength",
+        "racing_shoes",
+        "perry_buoy",
+    }
+
+    for i, item in ipairs(items) do
+        items_select:addItem({
+            id = item,
+            text = ElementsData[item].name,
+            hint = "Price: " .. ElementsData[item].price
+        })
+    end
+
+    items_select:addItem({
+        id = "back",
+        text = "Back",
+        hint = "Back to main menu"
+    })
+end
 
 function ShopScene:new()
     local self = setmetatable(Scene:new(), ShopScene)
     return self
+end
+
+function ShopScene:start()
+    current_select = shop_select
+    buildShop()
 end
 
 function ShopScene:update()
@@ -66,8 +84,11 @@ function ShopScene:draw()
 end
 
 local function selectMenuOptionSelected(option)
+    if option.id == nil then
+        return
+    end
     if option.id == "continue" then
-        CurrentScreen = Screens.game
+        ChangeScene(Screens.map)
     elseif option.id == "shop" then
         current_select = items_select
     elseif current_select.id == "shop_items" then

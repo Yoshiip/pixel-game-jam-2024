@@ -6,7 +6,7 @@ vector = require "utils.vector"
 
 
 
-local frame = love.graphics.newImage("resources/textures/frame.png")
+local frame = love.graphics.newImage("resources/textures/frame_2.png")
 UIImage = love.graphics.newImage("resources/textures/ui.png")
 
 UserInterface = {}
@@ -55,15 +55,34 @@ ElementsData = {
         name = "Aim Joystick",
         max_health = 5,
         rarity = -1,
-        size = vector(24, 24)
+        size = vector(32, 32)
     },
     strength = {
         type = "element",
         name = "Damage bonus",
         origin = vector(0, 224),
         size = vector(24, 24),
+        rarity = 3,
         price = 5
-    }
+    },
+    racing_shoes = {
+        type = "element",
+        name = "Speed bonus",
+        description = "Increase your speed by 20%",
+        origin = vector(0, 256),
+        size = vector(24, 24),
+        rarity = 3,
+        price = 5
+    },
+    perry_buoy = {
+        type = "element",
+        name = "Perry Buoy",
+        description = "Increase speed in water",
+        origin = vector(0, 288),
+        size = vector(24, 24),
+        rarity = 3,
+        price = 5
+    },
 }
 
 
@@ -145,6 +164,16 @@ function UserInterface:new()
     -- ))
 
     return self
+end
+
+function UserInterface:CountElementWorking(element_id)
+    local count = 0
+    for i, element in ipairs(UIElements) do
+        if element.id == element_id and element.health ~= nil and element.health > 0 then
+            count = count + 1
+        end
+    end
+    return count
 end
 
 function UserInterface:getButtonsWorking()

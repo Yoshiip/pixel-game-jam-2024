@@ -2,13 +2,14 @@ Atlas = love.graphics.newImage("resources/textures/atlas.png")
 vector = require "utils.vector"
 
 GameResolution = vector(240, 160)
-Resolution = vector(320, 400)
+Resolution = vector(288, 400)
 
 require "scene"
 require "scenes.intro"
 require "scenes.menu"
 require "scenes.game"
 require "scenes.shop"
+require "scenes.map"
 
 require "duck"
 require "fish"
@@ -23,13 +24,15 @@ Bindings = {
     move_left = { "q", "a", "left" },
     move_down = { "s", "s", "down" },
     move_right = { "d", "d", "right" },
+    shoot = { "mouse:0", "space" },
 }
 
 Screens = {
     intro = 1,
     menu = 2,
     game = 3,
-    shop = 4
+    shop = 4,
+    map = 5,
 }
 
 
@@ -53,11 +56,12 @@ Scenes = {
     MenuScene:new(),
     GameScene:new(),
     ShopScene:new(),
+    MapScene:new()
 }
 
 UI = UserInterface:new()
 
-CurrentScreen = Screens.shop
+CurrentScreen = 1
 
 Zoom = 2
 
@@ -102,6 +106,8 @@ function love.load()
 
     local x, y = love.window.getPosition()
     last_window_pos = vector(x, y)
+
+    ChangeScene(Screens.shop)
 end
 
 local function getScene()
@@ -129,7 +135,7 @@ function love.draw()
 
     love.graphics.setBlendMode("alpha", "premultiplied")
 
-    love.graphics.draw(GameCanvas, 40 * Zoom, 40 * Zoom, 0, Zoom, Zoom)
+    love.graphics.draw(GameCanvas, 24 * Zoom, 40 * Zoom, 0, Zoom, Zoom)
     love.graphics.draw(MainCanvas, 0, 0, 0, Zoom, Zoom)
     love.graphics.setColor(0.2, 0.3, 0.9, 0.3)
     love.graphics.draw(DropletsCanvas, 0, 0, 0, Zoom, Zoom)
@@ -141,8 +147,13 @@ function SpawnDroplet()
     table.insert(Droplets, Droplet:new(pos))
 end
 
+function ChangeScene(scene_id)
+    CurrentScreen = scene_id
+    getScene():start()
+end
+
 function PlayerExited()
-    CurrentScreen = Screens.shop
+    ChangeScene(Screens.shop)
 end
 
 local function handleWindowShake()
@@ -216,7 +227,11 @@ end
 
 function IsKeyPressed(binding_id)
     for i, hotkey in ipairs(Bindings[binding_id]) do
-        if love.keyboard.isDown(hotkey) then
+        if string.sub(hotkey, 1, 5) == "mouse" then
+            if love.mouse.isDown(tonumber(string.sub(hotkey, 7, 7))) then
+                return true
+            end
+        elseif love.keyboard.isDown(hotkey) then
             return true
         end
     end

@@ -16,8 +16,6 @@ function Joystick:new(id, pos, size)
     self.grab_valid = false
     self.grabbed = false
     self.grab_base_position = vector(0, 0)
-    self.collision = Collision:new(self, "button", pos, size)
-    table.insert(Collisions, self.collision)
     return self
 end
 

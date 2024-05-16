@@ -8,6 +8,7 @@ Duck.__index = Duck
 local duckTexture = love.graphics.newImage("resources/textures/duck.png")
 local duck_water_mask_texture = love.graphics.newImage("resources/textures/duck_water_mask.png")
 
+local shoot_max_timer = 0.3
 local friction = 0.085
 local acceleration = 0.075
 
@@ -40,6 +41,7 @@ function Duck:new()
     self.anim_frame = 0
     self.in_water = true
     self.zone_cleared = false
+    self.shoot_timer = 0.3
     self.anim_timer = 0.3
     self.flip = false
     self.shooting = false
@@ -113,10 +115,13 @@ function Duck:shoot()
     self.shooting = true
     self.anim_frame = 0
     self.vel = vector(0, 0)
+    print(2 + UI:CountElementWorking("strength"))
     local projectile = Projectile:new(
         vector(self.pos.x, self.pos.y),
         vel,
-        false
+        false,
+        "player",
+        2 + UI:CountElementWorking("strength")
     )
     table.insert(Projectiles, projectile)
 end
@@ -160,9 +165,13 @@ function Duck:update()
     local keys_pressed = {}
     for key, hotkeys in pairs(Bindings) do
         for i, hotkey in ipairs(hotkeys) do
-            if love.keyboard.isDown(hotkey) then
-                keys_pressed[key] = true
-            end
+            -- if string.sub(hotkey, 1, 5) == "mouse" then
+            --     if love.mouse.isDown(hotkey) then
+            --         keys_pressed[key] = true
+            --     end
+            -- elseif love.keyboard.isDown(hotkey) then
+            --     keys_pressed[key] = true
+            -- end
         end
     end
     if IsKeyPressed("move_left") == true and buttonsWorking["move_left"] == true then
@@ -176,6 +185,14 @@ function Duck:update()
     end
     if IsKeyPressed("move_down") and buttonsWorking["move_down"] == true then
         input.y = input.y + 1
+    end
+
+
+    self.shoot_timer = self.shoot_timer - delta
+
+    if IsKeyPressed("shoot") and self.shoot_timer < 0.0 then
+        self:shoot()
+        self.shoot_timer = shoot_max_timer
     end
 
     input = input:normalized()

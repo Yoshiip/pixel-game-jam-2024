@@ -61,7 +61,7 @@ end
 local function selectMenuOptionSelected(option)
     if current_menu.id == "main_menu" then
         if option.id == "play" then
-            CurrentScreen = Screens.game
+            ChangeScene(Screens.game)
         end
         if option.id == "credits" then
             current_menu = credits_select

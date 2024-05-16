@@ -14,10 +14,11 @@ local enemy_projectile_origin = vector(0, 32)
 local ball_projectile_origin = vector(128, 16)
 local watermelon_projectile_origin = vector(128, 32)
 
-function Projectile:new(pos, vel, from_enemy, type)
+function Projectile:new(pos, vel, from_enemy, type, damage)
     local self = setmetatable({}, Projectile)
     self.pos = pos
     self.vel = vel
+    self.damage = damage or 1
     self.anim_frame = 0
     self.anim_timer = 1 / 12
     self.from_enemy = from_enemy
@@ -101,7 +102,7 @@ function Projectile:update()
                 (self.from_enemy and colliding and coll.type == "player") or
                 (not self.from_enemy and colliding and coll.type == "enemy")
             ) then
-            coll.owner:damage(1)
+            coll.owner:damage(self.damage)
             self:destroy()
         end
     end

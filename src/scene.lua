@@ -7,6 +7,9 @@ function Scene:new(pos)
     return self
 end
 
+function Scene:start()
+end
+
 function Scene:draw()
 end
 
