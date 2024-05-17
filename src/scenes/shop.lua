@@ -18,7 +18,7 @@ local items_select = Select:new("shop_items", {
 
 local current_select = shop_select
 
-local buying = "none"
+Buying = "none"
 local sell_visible = false
 
 local function buildShop()
@@ -56,6 +56,10 @@ end
 function ShopScene:update()
     current_select:update()
 
+    if IsKeyPressed("cancel") then
+        Buying = "none"
+    end
+
     sell_visible = false
     for i, element in ipairs(UIElements) do
         if element.pos.y < GameResolution.y + 64 then
@@ -72,15 +76,14 @@ function ShopScene:draw()
     love.graphics.setCanvas(GameCanvas)
     love.graphics.clear(0, 0, 0, 1)
     love.graphics.setBlendMode("alpha")
+    current_select:draw()
 
-    if buying ~= "none" then
+    if Buying ~= "none" then
         love.graphics.print("Click where you want to place it", 20, 110)
     elseif sell_visible then
         love.graphics.print("Release to sell", 20, 110)
     end
     love.graphics.print("Money: " .. GameData.money .. " gears", 20, 90)
-
-    current_select:draw()
 end
 
 local function selectMenuOptionSelected(option)
@@ -95,17 +98,17 @@ local function selectMenuOptionSelected(option)
         if option.id == "back" then
             current_select = shop_select
         else
-            buying = option.id
+            Buying = option.id
         end
     end
 end
 
 function ShopScene:mousepressed(x, y, button)
-    if buying ~= "none" then
+    if Buying ~= "none" then
         local mouse = vector(love.mouse.getX(), love.mouse.getY())
         mouse = mouse / Zoom
-        UI:addElement(buying, mouse)
-        buying = "none"
+        UI:addElement(Buying, mouse)
+        Buying = "none"
     end
 end
 

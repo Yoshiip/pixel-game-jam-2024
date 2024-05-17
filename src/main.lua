@@ -1,8 +1,9 @@
 Atlas = love.graphics.newImage("resources/textures/atlas.png")
 vector = require "utils.vector"
 
+GamePos = vector(40, 60)
 GameResolution = vector(240, 160)
-Resolution = vector(288, 400)
+Resolution = vector(320, 440)
 
 require "scene"
 require "scenes.intro"
@@ -25,6 +26,7 @@ Bindings = {
     move_down = { "s", "s", "down" },
     move_right = { "d", "d", "right" },
     shoot = { "mouse:0", "space" },
+    cancel = { "escape", "backspace" },
 }
 
 Screens = {
@@ -114,12 +116,15 @@ local function getScene()
     return Scenes[CurrentScreen]
 end
 
+local tileTexture = love.graphics.newImage("resources/textures/tile.png")
+tileTexture:setWrap("repeat", "repeat")
+
 function love.draw()
     love.graphics.setCanvas(MainCanvas)
     love.graphics.clear(0, 0, 0, 0)
+
     love.graphics.setBlendMode("alpha")
     UI:draw()
-
 
 
     getScene():draw()
@@ -135,7 +140,11 @@ function love.draw()
 
     love.graphics.setBlendMode("alpha", "premultiplied")
 
-    love.graphics.draw(GameCanvas, 24 * Zoom, 40 * Zoom, 0, Zoom, Zoom)
+
+    local quad = love.graphics.newQuad(0, 0, Resolution.x * Zoom, Resolution.y * Zoom, 32, 32)
+    love.graphics.draw(tileTexture, quad, 1, 1)
+
+    love.graphics.draw(GameCanvas, GamePos.x * Zoom, GamePos.y * Zoom, 0, Zoom, Zoom)
     love.graphics.draw(MainCanvas, 0, 0, 0, Zoom, Zoom)
     love.graphics.setColor(0.2, 0.3, 0.9, 0.3)
     love.graphics.draw(DropletsCanvas, 0, 0, 0, Zoom, Zoom)
@@ -170,8 +179,8 @@ end
 function love.update()
     MousePos.x = love.mouse.getX()
     MousePos.y = love.mouse.getY()
-    GameMousePos.x = (MousePos.x - (40 * Zoom)) / Zoom
-    GameMousePos.y = (MousePos.y - (40 * Zoom)) / Zoom
+    GameMousePos.x = (MousePos.x - (GamePos.x * Zoom)) / Zoom
+    GameMousePos.y = (MousePos.y - (GamePos.y * Zoom)) / Zoom
     MousePos = MousePos / Zoom
 
 
@@ -192,16 +201,13 @@ function love.mousepressed(x, y, button)
 end
 
 function love.keypressed(key)
-    if key == "escape" then
-        love.event.quit()
-    end
     if key == "o" then
-        Zoom = Zoom - 1
-        love.window.setMode(320 * Zoom, 400 * Zoom)
+        Zoom = math.max(Zoom - 1, 1)
+        love.window.setMode(Resolution.x * Zoom, Resolution.y * Zoom)
     end
     if key == "p" then
-        Zoom = Zoom + 1
-        love.window.setMode(320 * Zoom, 400 * Zoom)
+        Zoom = math.max(Zoom + 1, 8)
+        love.window.setMode(Resolution.x * Zoom, Resolution.y * Zoom)
     end
     getScene():keypressed(key)
 end

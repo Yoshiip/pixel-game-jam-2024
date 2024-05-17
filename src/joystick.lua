@@ -10,11 +10,8 @@ function Joystick:new(id, pos, size)
     local self = setmetatable(UIElement:new(id, pos, vector(0, 0), size), Joystick)
     self.max_health = 5
     self.health = self.max_health
-    self.trauma = 0
     self.disabled = false
-    self.hovered = false
     self.grab_valid = false
-    self.grabbed = false
     self.grab_base_position = vector(0, 0)
     return self
 end
@@ -39,4 +36,13 @@ function Joystick:draw()
 
     mouse_delta.x = love.mouse.getX()
     mouse_delta.y = love.mouse.getY()
+
+    if self.hovered then
+        self:drawTooltip()
+    end
+end
+
+function Joystick:update()
+    UIElement.update(self)
+    UIElement.handleGrab(self)
 end

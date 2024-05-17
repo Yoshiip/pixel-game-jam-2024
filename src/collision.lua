@@ -1,6 +1,6 @@
 vector = require "utils.vector"
 
-DebugCollision = false
+DebugCollision = true
 
 Collision = {}
 Collision.__index = Collision

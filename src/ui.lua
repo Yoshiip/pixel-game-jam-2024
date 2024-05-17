@@ -1,6 +1,8 @@
 require "ui_element"
 require "button"
+require "emblem"
 require "joystick"
+
 vector = require "utils.vector"
 
 
@@ -58,7 +60,7 @@ ElementsData = {
         size = vector(32, 32)
     },
     strength = {
-        type = "element",
+        type = "emblem",
         name = "Damage bonus",
         origin = vector(0, 224),
         size = vector(24, 24),
@@ -66,7 +68,7 @@ ElementsData = {
         price = 5
     },
     racing_shoes = {
-        type = "element",
+        type = "emblem",
         name = "Speed bonus",
         description = "Increase your speed by 20%",
         origin = vector(0, 256),
@@ -75,7 +77,7 @@ ElementsData = {
         price = 5
     },
     perry_buoy = {
-        type = "element",
+        type = "emblem",
         name = "Perry Buoy",
         description = "Increase speed in water",
         origin = vector(0, 288),
@@ -100,6 +102,13 @@ function UserInterface:addElement(id, pos)
         table.insert(UIElements, Joystick:new(
             id,
             pos,
+            data.size
+        ))
+    elseif data.type == "emblem" then
+        table.insert(UIElements, Emblem:new(
+            id,
+            pos,
+            data.origin,
             data.size
         ))
     elseif data.type == "element" then
@@ -198,6 +207,7 @@ local cursorDefault = love.mouse.getSystemCursor("arrow")
 local cursorHand = love.mouse.getSystemCursor("hand")
 local cursorGrab = love.mouse.getSystemCursor("sizeall")
 local cursorNo = love.mouse.getSystemCursor("no")
+local cursorCrosshair = love.mouse.getSystemCursor("crosshair")
 
 
 function UserInterface:update()
@@ -215,6 +225,8 @@ function UserInterface:update()
         end
     end
 
+    print(Scenes[CurrentScreen].buying)
+
     if element_grabbed > 0 then
         love.mouse.setCursor(cursorGrab)
     elseif element_hovered > 0 then
@@ -223,6 +235,8 @@ function UserInterface:update()
         else
             love.mouse.setCursor(cursorNo)
         end
+    elseif Buying ~= "none" then
+        love.mouse.setCursor(cursorCrosshair)
     else
         love.mouse.setCursor(cursorDefault)
     end

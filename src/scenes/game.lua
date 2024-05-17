@@ -60,9 +60,9 @@ function GameScene:draw()
     love.graphics.draw(test_water_texture, love.graphics.newQuad(0, 0, 240, 160, test_water_texture:getDimensions()), 0,
         0, 0, 1, 1)
 
-    -- for i, water in ipairs(water_zones) do
-    --     love.graphics.draw(water_zone_texture, water.x, water.y)
-    -- end
+    for i, water in ipairs(water_zones) do
+        love.graphics.draw(water_zone_texture, water.x, water.y)
+    end
 
     -- draw all shadows
     love.graphics.setColor(1, 1, 1, 0.4)

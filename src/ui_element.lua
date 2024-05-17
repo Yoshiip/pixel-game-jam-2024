@@ -10,6 +10,7 @@ function UIElement:new(id, pos, origin, size)
     self.trauma = 0.0
     self.hovered = false
     self.disabled = false
+    self.grabbed = false
     self.origin = origin
     self.size = size
     self.collision = Collision:new(self, "button", pos, size)
@@ -46,7 +47,7 @@ function UIElement:draw()
 end
 
 function UIElement:drawTooltip()
-    if self.hovered then
+    if self.hovered and not self.grabbed then
         local data = ElementsData[self.id]
         local base_offset = self.pos + vector(8, 8)
         love.graphics.setColor(0.4, 0.4, 0.4, 0.3)
@@ -73,5 +74,23 @@ function UIElement:update()
         self.hovered = true
     else
         self.hovered = false
+    end
+
+    self.collision.pos = self.pos - (self.size / 2)
+end
+
+function UIElement:handleGrab()
+    if self.grabbed then
+        local grab_pos = MousePos - self.grab_base_position
+        grab_pos.x = math.clamp(grab_pos.x, 32, Resolution.x - 32)
+        grab_pos.y = math.clamp(grab_pos.y, 64, Resolution.y - 32)
+        self.grab_valid = true
+
+        for i, button in ipairs(UIElements) do
+            if i ~= indexOf(UIElements, self) and button.collision ~= nil and button.collision:checkRectangle(self.collision) then
+                self.grab_valid = false
+            end
+        end
+        self.pos = grab_pos
     end
 end
