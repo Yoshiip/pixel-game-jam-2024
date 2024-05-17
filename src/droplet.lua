@@ -6,7 +6,7 @@ require "collision"
 Droplet = {}
 Droplet.__index = Droplet
 
-local drop_max_time = 0.4
+local drop_max_time = 0.1
 
 function Droplet:new(pos)
     local self = setmetatable({}, Droplet)
@@ -72,7 +72,7 @@ function Droplet:update()
     for i = #Collisions, 1, -1 do
         local coll = Collisions[i]
         local colliding = Collision.checkRectangle(self.collision, coll)
-        if (colliding and coll.type == "button") then
+        if (colliding and coll.type == "button" and coll.owner.health > 0) then
             coll.owner:damage(1)
             self:destroy()
         end

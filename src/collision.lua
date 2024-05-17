@@ -1,13 +1,14 @@
 vector = require "utils.vector"
 
-DebugCollision = true
+DebugCollision = false
 
 Collision = {}
 Collision.__index = Collision
 
-function Collision:new(owner, type, pos, size)
+function Collision:new(owner, type, pos, size, shape)
     local self = setmetatable({}, Collision)
     self.owner = owner
+    self.shape = "rectangle"
     self.type = type
     self.pos = pos
     self.size = size

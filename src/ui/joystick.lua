@@ -1,4 +1,4 @@
-require "ui_element"
+require "src.ui.ui_element"
 require "collision"
 vector = require "utils.vector"
 

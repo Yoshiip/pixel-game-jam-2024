@@ -50,7 +50,11 @@ Droplets = {}
 UIElements = {}
 
 GameData = {
-    money = 50
+    life = 1,
+    level = 1,
+    money = 50,
+    tsunami_distance = 0,
+    player_distance = 0,
 }
 
 Scenes = {
@@ -99,11 +103,6 @@ function love.load()
 
 
     Player = Duck:new()
-
-    for i = 1, 5 do
-        local pos = vector(math.random(0, 240), math.random(0, 160))
-        table.insert(Fishes, Fish:new(love.math.random(1, 4), pos))
-    end
 
 
     local x, y = love.window.getPosition()

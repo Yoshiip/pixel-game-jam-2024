@@ -115,7 +115,6 @@ function Duck:shoot()
     self.shooting = true
     self.anim_frame = 0
     self.vel = vector(0, 0)
-    print(2 + UI:CountElementWorking("strength"))
     local projectile = Projectile:new(
         vector(self.pos.x, self.pos.y),
         vel,

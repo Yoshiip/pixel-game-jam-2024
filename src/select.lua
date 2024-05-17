@@ -21,17 +21,25 @@ function Select:draw()
     love.graphics.setColor(0.1, 0.3, 0.3, 1.0)
     love.graphics.rectangle("fill", self.pos.x, self.pos.y, self.size.x, self.size.y, 10, 10)
     love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
+    local offset = self.pos.y
     for i, option in ipairs(self.options) do
-        local base_y = self.pos.y + ((i - 1) * self.spacing)
-        if i == self.selected then
-            love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
-            love.graphics.rectangle("fill", self.pos.x, base_y, self.size.x, self.spacing, 10, 10)
-            love.graphics.setColor(0.0, 0.0, 0.0, 1.0)
+        if self.options[i].type == "text" then
+            for i, line in ipairs(self.options[i].texts) do
+                love.graphics.print(line, self.pos.x + 8, offset)
+                offset = offset + 10
+            end
         else
+            if i == self.selected then
+                love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
+                love.graphics.rectangle("fill", self.pos.x, offset, self.size.x, self.spacing, 10, 10)
+                love.graphics.setColor(0.0, 0.0, 0.0, 1.0)
+            else
+                love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
+            end
+            love.graphics.print(option.text, self.pos.x + 8, offset)
             love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
         end
-        love.graphics.print(option.text, self.pos.x + 8, base_y)
-        love.graphics.setColor(1.0, 1.0, 1.0, 1.0)
+        offset = offset + self.spacing
     end
 
     -- draw hint

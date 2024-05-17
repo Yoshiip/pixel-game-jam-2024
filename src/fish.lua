@@ -5,26 +5,30 @@ require 'collision'
 Fish = {}
 Fish.__index = Fish
 
-local enemies = {
+Enemies = {
     {
+        min_level = 1,
         max_health = 3,
         speed = 15,
         animation_origin = vector(0, 0),
         animation_frame_count = 2
     },
     {
+        min_level = 2,
         max_health = 5,
         speed = 20,
         animation_origin = vector(32, 0),
         animation_frame_count = 2
     },
     {
+        min_level = 3,
         max_health = 8,
         speed = 25,
         animation_origin = vector(64, 0),
         animation_frame_count = 2
     },
     {
+        min_level = 4,
         max_health = 15,
         speed = 35,
         animation_origin = vector(96, 0),
@@ -41,7 +45,8 @@ local anim_frame_size = vector(32, 32)
 function Fish:new(id, pos)
     local self = setmetatable({}, Fish)
     self.pos = pos
-    self.enemy_data = enemies[id]
+    self.id = id
+    self.enemy_data = Enemies[id]
     self.max_health = self.enemy_data.max_health
     self.health = self.max_health
     self.ia_mode = love.math.random(0, 1) -- 0 = random point, 1 = player position

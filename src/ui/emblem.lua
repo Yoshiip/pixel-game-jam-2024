@@ -1,4 +1,4 @@
-require "ui_element"
+require "src.ui.ui_element"
 require "collision"
 vector = require "utils.vector"
 
@@ -10,6 +10,7 @@ function Emblem:new(id, pos, origin, size)
     local self = setmetatable(UIElement:new(id, pos, origin, size), Emblem)
 
     self.max_health = 5
+    self.level = 1
     self.health = self.max_health
     self.disabled = false
     self.grab_valid = false
@@ -25,6 +26,7 @@ end
 
 function Emblem:draw()
     local quad_offset = vector(self.origin.x, self.origin.y)
+    quad_offset.y = quad_offset.y + (self.level - 1) * 32
     if self.disabled then
         quad_offset.x = quad_offset.x + 32
     elseif self.hovered then

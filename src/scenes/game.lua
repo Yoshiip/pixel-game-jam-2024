@@ -2,8 +2,6 @@ GameScene = {}
 GameScene.__index = GameScene
 setmetatable(GameScene, { __index = Scene })
 
-
-
 local ground = love.graphics.newImage("resources/textures/ground.png")
 local water_zone_texture = love.graphics.newImage("resources/textures/water_zone.png")
 local test_water_texture = love.graphics.newImage("resources/textures/terrains/4.png")
@@ -30,9 +28,29 @@ function GameScene:new()
     return self
 end
 
+function GameScene:generateWave()
+    local points = 50 + GameData.level * 25
+    while points > 0 do
+        local random_enemy = Enemies[love.math.random(1, 4)]
+        if random_enemy.min_level >= GameData.level then
+            local pos = vector(love.math.random(0, 240), love.math.random(0, 160))
+            table.insert(Fishes, Fish:new(love.math.random(1, 4), pos))
+            points = points - random_enemy.max_health
+        end
+    end
+end
+
+function GameScene:start()
+    Duck.pos = GameResolution / 2
+
+    self:generateWave()
+end
+
 function GameScene:update()
     if #Fishes == 0 then
         Player.zone_cleared = true
+    else
+        Player.zone_cleared = false
     end
 
     Player:update()

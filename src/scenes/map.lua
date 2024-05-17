@@ -5,12 +5,10 @@ local sign_select = Select:new("sign", {
     {
         id = "go_up",
         text = "Aller en haut",
-        hint = "Pourquoi pas ?"
     },
     {
         id = "go_down",
         text = "Aller en bas",
-        hint = "Pourquoi pas ?"
     },
 },
 vector(0, 80)
